@@ -1,11 +1,16 @@
 package org.devesh.authenticationservice.controller;
 
+import org.apache.catalina.User;
 import org.devesh.authenticationservice.dto.ApplicationUserDTO;
 import org.devesh.authenticationservice.dto.AuthRequestDTO;
 import org.devesh.authenticationservice.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +19,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @GetMapping
     public String test(){
@@ -27,8 +35,15 @@ public class AuthController {
 
     @PostMapping("/token")
     public ResponseEntity<String> generateToken(@RequestBody AuthRequestDTO authRequestDTO){
-        String token = authenticationService.generateJWTToken(authRequestDTO.getUserName());
-        return new ResponseEntity<>(token, HttpStatus.CREATED);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
+                (authRequestDTO.getUserName(), authRequestDTO.getPassword()));
+        if (authentication.isAuthenticated()){
+            String token = authenticationService.generateJWTToken(authRequestDTO.getUserName());
+            return new ResponseEntity<>(token, HttpStatus.CREATED);
+        }else {
+            throw new UsernameNotFoundException("Invalid Credentials");
+        }
+
     }
 
     @GetMapping("/validate")
