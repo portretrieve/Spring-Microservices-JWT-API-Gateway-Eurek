@@ -43,7 +43,6 @@ public class AuthController {
         }else {
             throw new UsernameNotFoundException("Invalid Credentials");
         }
-
     }
 
     @GetMapping("/validate")

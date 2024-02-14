@@ -21,14 +21,6 @@ spring:
           predicates:
             - Path=/auth/**
 
-
-#      routes:
-#        - id: swiggy-app
-#          uri: lb://SWIGGY-APP
-#          predicates:
-#            - Path=/swiggy/**
-
-
   application:
     name: SWIGGY-GATEWAY
 
